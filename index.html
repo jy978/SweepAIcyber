@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Sweep AI is a cybersecurity SaaS platform. Agent and Shield are launching soon."
+    />
+    <title>Sweep AI — Making security easier to understand</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #172019;
+        --muted: #6f7c72;
+        --paper: #f4f7f1;
+        --card: #ffffff;
+        --lime: #d9f568;
+        --sage: #dfeadd;
+        --line: #d8e2d8;
+        --forest: #193c2a;
+        --blue: #dcecff;
+        --shadow: 0 20px 60px rgba(23, 32, 25, 0.08);
+        --radius: 22px;
+      }
+
+      * { box-sizing: border-box; scroll-behavior: smooth; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Space Grotesk", Arial, sans-serif; }
+      body.modal-open { overflow: hidden; }
+      button, input { font: inherit; }
+      button, a { -webkit-tap-highlight-color: transparent; }
+      button { cursor: pointer; }
+      a { color: inherit; text-decoration: none; }
+      .site-shell { overflow: hidden; }
+      .section-wrap { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+
+      .site-header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 22px; min-height: 78px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); border-bottom: 1px solid rgba(216, 226, 216, 0.9); background: rgba(244, 247, 241, 0.86); backdrop-filter: blur(18px); }
+      .brand { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
+      .brand-mark { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--ink); border-radius: 12px; background: var(--lime); color: var(--ink); font-weight: 700; }
+      .brand strong, .brand small { display: block; }
+      .brand strong { font-size: 0.96rem; letter-spacing: -0.04em; }
+      .brand small { margin-top: 2px; color: var(--muted); font-family: "DM Mono", monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; }
+      .main-nav { display: flex; align-items: center; gap: 26px; margin-left: auto; margin-right: 12px; color: var(--muted); font-size: 0.78rem; }
+      .main-nav a, .mobile-nav a { transition: color 0.2s ease; }
+      .main-nav a:hover, .mobile-nav a:hover { color: var(--ink); }
+      .header-actions { display: flex; align-items: center; gap: 13px; }
+      .text-button { border: 0; background: transparent; color: var(--ink); font-size: 0.78rem; }
+      .button { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 44px; padding: 0 17px; border: 1px solid transparent; border-radius: 10px; font-size: 0.76rem; font-weight: 600; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+      .button:hover { transform: translateY(-2px); }
+      .button span { font-size: 1rem; line-height: 0; }
+      .button-dark { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+      .button-dark:hover { background: var(--forest); border-color: var(--forest); }
+      .button-lime { background: var(--lime); color: var(--ink); }
+      .button-lime:hover { background: #c9e953; }
+      .button-ghost { border-color: var(--line); background: transparent; color: var(--ink); }
+      .button-ghost:hover { border-color: var(--ink); background: var(--card); }
+      .menu-button { display: none; width: 38px; height: 38px; padding: 8px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); }
+      .menu-button span { display: block; width: 20px; height: 1px; margin: 5px auto; background: var(--ink); }
+      .mobile-nav { position: absolute; top: calc(100% + 1px); left: 0; right: 0; display: grid; gap: 4px; padding: 18px 24px 22px; border-bottom: 1px solid var(--line); background: var(--paper); box-shadow: var(--shadow); }
+      .mobile-nav[hidden] { display: none; }
+      .mobile-nav a { padding: 11px 0; color: var(--muted); }
+      .mobile-nav .button { margin-top: 8px; color: var(--paper); }
+
+      .hero { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr); align-items: center; gap: 60px; min-height: 680px; padding-top: 90px; padding-bottom: 90px; }
+      .kicker, .eyebrow { color: var(--muted); font-family: "DM Mono", monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; }
+      .kicker { display: flex; align-items: center; gap: 9px; margin: 0 0 22px; }
+      .kicker-dot { width: 8px; height: 8px; border-radius: 50%; background: #55ae7a; box-shadow: 0 0 0 4px #d7f0df; }
+      h1, h2, h3, p { margin-top: 0; }
+      h1, h2 { letter-spacing: -0.08em; }
+      h1 { max-width: 650px; margin-bottom: 25px; font-size: clamp(3.8rem, 8vw, 7.8rem); line-height: 0.88; }
+      h1 em, h2 em { color: #4b996d; font-style: normal; }
+      .hero-lede { max-width: 530px; margin-bottom: 27px; color: var(--muted); font-size: 1.02rem; line-height: 1.65; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+      .hero-note { max-width: 470px; margin: 28px 0 0; color: var(--muted); font-size: 0.73rem; line-height: 1.55; }
+      .hero-art { position: relative; min-height: 480px; border: 1px solid var(--line); border-radius: 42% 58% 52% 48% / 46% 42% 58% 54%; background: radial-gradient(circle at 50% 48%, rgba(217, 245, 104, 0.65) 0 8%, transparent 9%), linear-gradient(135deg, #deeddc, #cfe7f1 53%, #e1f17c); box-shadow: var(--shadow); transform: rotate(3deg); }
+      .hero-art::before, .hero-art::after { position: absolute; content: ""; border: 1px solid rgba(23, 32, 25, 0.18); border-radius: 50%; }
+      .hero-art::before { inset: 13% 8%; transform: rotate(-19deg); }
+      .hero-art::after { inset: 5% 20%; transform: rotate(31deg); }
+      .orbit { position: absolute; inset: 18% 14%; border: 1px solid rgba(23, 32, 25, 0.3); border-radius: 50%; }
+      .orbit-one { transform: rotate(54deg) scaleY(0.42); }
+      .orbit-two { transform: rotate(-27deg) scaleY(0.72); }
+      .orbit-three { inset: 29% 5%; transform: rotate(4deg) scaleY(0.25); }
+      .data-core { position: absolute; top: 50%; left: 50%; display: grid; width: 142px; height: 142px; place-content: center; border: 1px solid var(--ink); border-radius: 50%; background: var(--ink); color: var(--lime); text-align: center; transform: translate(-50%, -50%) rotate(-3deg); box-shadow: 0 12px 30px rgba(23, 32, 25, 0.22); }
+      .core-letter { display: block; font-size: 3.8rem; font-weight: 700; line-height: 0.8; letter-spacing: -0.12em; }
+      .core-label { margin-top: 13px; font-family: "DM Mono", monospace; font-size: 0.54rem; line-height: 1.4; letter-spacing: 0.12em; }
+      .data-chip { position: absolute; padding: 8px 10px; border: 1px solid var(--ink); border-radius: 6px; background: var(--paper); color: var(--ink); font-family: "DM Mono", monospace; font-size: 0.58rem; box-shadow: 4px 4px 0 rgba(23, 32, 25, 0.14); }
+      .chip-one { top: 19%; left: 12%; }
+      .chip-two { right: 8%; top: 39%; background: var(--lime); }
+      .chip-three { bottom: 16%; left: 28%; }
+      .signal { position: absolute; display: block; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); }
+      .signal-one { top: 16%; right: 24%; }
+      .signal-two { bottom: 24%; right: 17%; background: #4b996d; }
+      .signal-three { bottom: 16%; left: 15%; background: #779de1; }
+
+      .proof-strip { display: grid; grid-template-columns: repeat(4, 1fr); margin-bottom: 140px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      .proof-strip div { display: flex; align-items: center; gap: 16px; padding: 22px 18px; border-right: 1px solid var(--line); }
+      .proof-strip div:first-child { padding-left: 0; }
+      .proof-strip div:last-child { border-right: 0; }
+      .proof-strip strong { color: #4b996d; font-family: "DM Mono", monospace; font-size: 0.65rem; }
+      .proof-strip span { font-size: 0.82rem; }
+
+      .intro-section, .models-section, .roadmap-section, .about-section { padding-bottom: 145px; }
+      .section-heading { margin-bottom: 54px; }
+      .section-heading .eyebrow { margin-bottom: 18px; }
+      .section-heading h2 { max-width: 760px; margin-bottom: 0; font-size: clamp(2.8rem, 5.5vw, 5.8rem); line-height: 0.91; }
+      .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start; }
+      .large-copy { max-width: 480px; font-size: clamp(1.45rem, 2.6vw, 2.2rem); line-height: 1.2; letter-spacing: -0.05em; }
+      .feature-list { border-top: 1px solid var(--line); }
+      .feature-item { display: grid; grid-template-columns: 48px 1fr; gap: 15px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+      .feature-number { color: #4b996d; font-family: "DM Mono", monospace; font-size: 0.68rem; }
+      .feature-item h3 { margin-bottom: 7px; font-size: 1.02rem; }
+      .feature-item p { margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+      .split-heading { display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+      .heading-aside { max-width: 340px; margin: 0 0 5px; color: var(--muted); font-size: 0.83rem; line-height: 1.6; }
+
+      .model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .model-card { min-height: 360px; display: flex; flex-direction: column; padding: 26px; border: 1px solid var(--ink); border-radius: var(--radius); box-shadow: 8px 8px 0 rgba(23, 32, 25, 0.08); }
+      .model-card-light { background: var(--card); }
+      .model-card-dark { background: var(--ink); color: var(--paper); }
+      .model-topline, .model-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: "DM Mono", monospace; font-size: 0.6rem; text-transform: uppercase; }
+      .model-index { opacity: 0.65; }
+      .status-pill { padding: 6px 8px; border: 1px solid currentColor; border-radius: 20px; font-size: 0.53rem; opacity: 0.75; }
+      .model-card h3 { margin: 60px 0 14px; font-size: 2.4rem; letter-spacing: -0.07em; }
+      .model-description { max-width: 380px; margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+      .model-card-dark .model-description { color: #aebdb0; }
+      .model-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid currentColor; opacity: 0.75; }
+      .quality-banner { display: flex; align-items: center; gap: 17px; margin-top: 18px; padding: 20px 22px; border-radius: 14px; background: var(--sage); }
+      .quality-icon { display: grid; width: 33px; height: 33px; flex-shrink: 0; place-items: center; border-radius: 50%; background: var(--ink); color: var(--lime); }
+      .quality-banner p { margin: 0; color: #48604d; font-size: 0.78rem; line-height: 1.55; }
+      .quality-banner strong { color: var(--ink); }
+
+      .roadmap { position: relative; display: grid; gap: 0; }
+      .roadmap-line { position: absolute; top: 10px; bottom: 10px; left: 20px; width: 1px; background: var(--line); }
+      .roadmap-item { position: relative; display: grid; grid-template-columns: 52px 190px 1fr; gap: 28px; padding: 0 0 60px; }
+      .roadmap-item:last-child { padding-bottom: 0; }
+      .roadmap-marker { z-index: 1; display: grid; width: 41px; height: 41px; place-items: center; border: 1px solid var(--ink); border-radius: 50%; background: var(--paper); color: var(--ink); font-family: "DM Mono", monospace; font-size: 0.64rem; }
+      .roadmap-current .roadmap-marker { background: var(--lime); }
+      .roadmap-date { padding-top: 11px; font-family: "DM Mono", monospace; font-size: 0.68rem; text-transform: uppercase; }
+      .roadmap-date span { display: block; margin-top: 7px; color: #4b996d; font-size: 0.57rem; }
+      .roadmap-content { max-width: 540px; padding: 9px 0 0; border-top: 1px solid var(--line); }
+      .roadmap-content h3 { margin-bottom: 9px; font-size: 1.35rem; letter-spacing: -0.05em; }
+      .roadmap-content p { margin-bottom: 15px; color: var(--muted); font-size: 0.79rem; line-height: 1.6; }
+      .roadmap-tag { display: inline-block; padding: 7px 9px; border-radius: 5px; background: var(--blue); color: #3e6794; font-family: "DM Mono", monospace; font-size: 0.58rem; text-transform: uppercase; }
+
+      .about-card { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 70px; align-items: center; padding: 70px; border-radius: 32px; background: var(--forest); color: var(--paper); }
+      .about-stamp { display: grid; width: 220px; height: 220px; place-items: center; border: 1px solid var(--lime); border-radius: 50%; color: var(--lime); font-family: "DM Mono", monospace; font-size: 0.82rem; line-height: 1.5; text-align: center; letter-spacing: 0.12em; transform: rotate(-13deg); }
+      .about-copy .eyebrow { color: #a4c5ab; }
+      .about-copy h2 { max-width: 610px; margin-bottom: 20px; font-size: clamp(2.5rem, 4.5vw, 5rem); line-height: 0.93; }
+      .about-copy h2 em { color: var(--lime); }
+      .about-copy p:not(.eyebrow):not(.about-disclaimer) { max-width: 560px; color: #c0d2c2; font-size: 0.86rem; line-height: 1.7; }
+      .about-disclaimer { max-width: 520px; margin: 26px 0; padding-left: 13px; border-left: 2px solid var(--lime); color: #a4c5ab; font-size: 0.7rem; line-height: 1.6; }
+      .join-section { display: flex; align-items: end; justify-content: space-between; gap: 50px; padding-bottom: 110px; }
+      .join-section h2 { margin: 11px 0 0; font-size: clamp(2.5rem, 5vw, 5.2rem); line-height: 0.92; }
+      .join-section > div:last-child { max-width: 330px; }
+      .join-section p { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
+      .join-section .button { margin-top: 8px; }
+      .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 25px; padding-bottom: 28px; border-top: 1px solid var(--line); color: var(--muted); }
+      .site-footer p, .back-top { margin: 0; font-family: "DM Mono", monospace; font-size: 0.59rem; text-transform: uppercase; }
+      .back-top:hover { color: var(--ink); }
+
+      .modal[hidden] { display: none; }
+      .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 18px; background: rgba(13, 22, 15, 0.58); }
+      .modal-card { position: relative; width: min(460px, 100%); padding: 35px; border-radius: 22px; background: var(--card); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.24); }
+      .modal-close { position: absolute; top: 16px; right: 17px; width: 31px; height: 31px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); font-size: 1.1rem; }
+      .modal-close:hover { border-color: var(--ink); }
+      .modal-card h2 { margin: 14px 0 9px; font-size: 2.5rem; line-height: 0.95; }
+      .modal-intro, .modal-footnote { color: var(--muted); font-size: 0.78rem; line-height: 1.55; }
+      .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 25px 0 20px; padding: 4px; border-radius: 9px; background: var(--sage); }
+      .auth-tab { padding: 10px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: 0.76rem; }
+      .auth-tab.selected { background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(23, 32, 25, 0.08); }
+      .auth-form { display: grid; gap: 14px; }
+      .auth-form[hidden] { display: none; }
+      .auth-form label { display: grid; gap: 7px; color: var(--muted); font-size: 0.72rem; }
+      .auth-form input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; outline: 0; background: var(--paper); color: var(--ink); }
+      .auth-form input:focus { border-color: var(--ink); }
+      .full-width { width: 100%; margin-top: 4px; }
+      .form-message { min-height: 20px; margin: 13px 0 0; color: #a33737; font-size: 0.72rem; }
+      .form-message.ok { color: #2f7a52; }
+      .modal-footnote { margin-bottom: 0; font-size: 0.68rem; }
+
+      @media (max-width: 950px) {
+        .main-nav { gap: 15px; }
+        .hero { grid-template-columns: 1fr; gap: 35px; padding-top: 65px; }
+        .hero-art { width: min(650px, 100%); min-height: 430px; margin: 0 auto; }
+        .about-card { grid-template-columns: 1fr; gap: 40px; padding: 45px; }
+        .about-stamp { width: 165px; height: 165px; font-size: 0.66rem; }
+      }
+
+      @media (max-width: 700px) {
+        .site-header { min-height: 67px; padding: 0 18px; }
+        .main-nav, .header-actions .text-button { display: none; }
+        .menu-button { display: block; }
+        .header-actions { margin-left: auto; }
+        .section-wrap { width: min(100% - 32px, 1180px); }
+        .hero { min-height: auto; padding-top: 55px; padding-bottom: 65px; }
+        h1 { font-size: clamp(3.6rem, 18vw, 6.2rem); }
+        .hero-art { min-height: 340px; border-radius: 39% 61% 55% 45% / 45% 43% 57% 55%; }
+        .data-core { width: 110px; height: 110px; }
+        .core-letter { font-size: 3rem; }
+        .proof-strip { grid-template-columns: 1fr 1fr; margin-bottom: 90px; }
+        .proof-strip div, .proof-strip div:first-child { padding: 16px 10px; }
+        .proof-strip div:nth-child(2) { border-right: 0; }
+        .proof-strip div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+        .section-heading, .split-heading { display: block; margin-bottom: 35px; }
+        .heading-aside { margin-top: 18px; }
+        .intro-grid { grid-template-columns: 1fr; gap: 35px; }
+        .intro-section, .models-section, .roadmap-section, .about-section { padding-bottom: 95px; }
+        .model-grid { grid-template-columns: 1fr; }
+        .model-card { min-height: 280px; }
+        .model-card h3 { margin-top: 35px; }
+        .roadmap-item { grid-template-columns: 44px 1fr; gap: 16px; }
+        .roadmap-date { grid-column: 2; grid-row: 1; padding-top: 8px; }
+        .roadmap-content { grid-column: 2; grid-row: 2; }
+        .roadmap-line { left: 20px; }
+        .join-section, .site-footer { display: block; }
+        .join-section > div:last-child { margin-top: 28px; }
+        .site-footer .brand { margin-bottom: 18px; }
+        .site-footer .back-top { display: inline-block; margin-top: 16px; }
+        .modal-card { padding: 30px 22px; }
+      }
+
+      @media (max-width: 430px) {
+        .header-actions .button { padding: 0 11px; font-size: 0.68rem; }
+        .hero-actions .button { width: 100%; }
+        .hero-art { min-height: 290px; }
+        .chip-one { left: 8%; }
+        .chip-two { right: 4%; }
+        .chip-three { left: 17%; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="site-shell">
+      <header class="site-header" id="top">
+        <a class="brand" href="#top" aria-label="Sweep AI home">
+          <span class="brand-mark">S</span>
+          <span>
+            <strong>Sweep AI</strong>
+            <small>security, understood</small>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="#why-sweep">Why Sweep</a>
+          <a href="#products">Products</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#about">About</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="text-button" id="loginButton" type="button">Log in</button>
+          <button class="button button-dark" id="signupButton" type="button">Sign up <span>↗</span></button>
+          <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+
+        <div class="mobile-nav" id="mobileNav" hidden>
+          <a href="#why-sweep">Why Sweep</a>
+          <a href="#products">Products</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#about">About</a>
+          <button class="button button-dark" id="mobileSignup" type="button">Sign up <span>↗</span></button>
+        </div>
+      </header>
+
+      <main>
+        <!-- HERO -->
+        <section class="hero section-wrap">
+          <div>
+            <p class="kicker"><i class="kicker-dot"></i> Agent launching <b data-launch="0"></b></p>
+            <h1>Security you can <em>actually</em> read.</h1>
+            <p class="hero-lede">
+              Sweep AI is a cybersecurity SaaS platform. Agent detects and responds to threats, and Shield blocks them
+              before they land. Two products, built to work together.
+            </p>
+            <div class="hero-actions">
+              <button class="button button-lime" data-open-signup type="button">Get early access <span>↗</span></button>
+              <a class="button button-ghost" href="#roadmap">See the roadmap</a>
+            </div>
+            <p class="hero-note">
+              Pre-launch. Products and dates below are our current plan and may change as we build.
+            </p>
+          </div>
+
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="orbit orbit-three"></div>
+            <div class="data-core">
+              <span class="core-letter">S</span>
+              <span class="core-label">PROTECTED</span>
+            </div>
+            <span class="data-chip chip-one">threat.detected</span>
+            <span class="data-chip chip-two">shield.active</span>
+            <span class="data-chip chip-three">scan: clean</span>
+            <span class="signal signal-one"></span>
+            <span class="signal signal-two"></span>
+            <span class="signal signal-three"></span>
+          </div>
+        </section>
+
+        <!-- PROOF STRIP -->
+        <section class="section-wrap">
+          <div class="proof-strip">
+            <div><strong>01</strong><span>Detect threats</span></div>
+            <div><strong>02</strong><span>Respond automatically</span></div>
+            <div><strong>03</strong><span>Block attacks early</span></div>
+            <div><strong>04</strong><span>Report clearly</span></div>
+          </div>
+        </section>
+
+        <!-- WHY -->
+        <section class="intro-section section-wrap" id="why-sweep">
+          <div class="section-heading">
+            <p class="eyebrow">Why Sweep</p>
+            <h2>Cybersecurity, without the <em>noise.</em></h2>
+          </div>
+          <div class="intro-grid">
+            <p class="large-copy">
+              Most security tools are loud, complex and hard to trust. Sweep AI is a SaaS suite that stays simple to
+              run and clear about what it's doing.
+            </p>
+            <div class="feature-list">
+              <div class="feature-item">
+                <span class="feature-number">01</span>
+                <div>
+                  <h3>One product at a time</h3>
+                  <p>Each product does one job well. Use one on its own or combine them for full coverage.</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span class="feature-number">02</span>
+                <div>
+                  <h3>Automation first</h3>
+                  <p>Spend less time triaging alerts. Sweep handles the routine and flags what matters.</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span class="feature-number">03</span>
+                <div>
+                  <h3>Plain-language reporting</h3>
+                  <p>See what happened, why it happened and what was done, without needing a security degree.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PRODUCTS -->
+        <section class="models-section section-wrap" id="products">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">Products</p>
+              <h2>Two products. <em>One</em> sweep.</h2>
+            </div>
+            <p class="heading-aside">Agent finds and handles threats. Shield stops them from getting in at all.</p>
+          </div>
+
+          <div class="model-grid">
+            <article class="model-card model-card-light">
+              <div class="model-topline"><span class="model-index">01</span><span class="status-pill">Up next</span></div>
+              <h3>Agent</h3>
+              <p class="model-description">A SaaS security agent that monitors your systems and responds to threats around the clock.</p>
+              <div class="model-footer"><span>Detect &amp; respond</span><span data-launch="0"></span></div>
+            </article>
+
+            <article class="model-card model-card-dark">
+              <div class="model-topline"><span class="model-index">02</span><span class="status-pill">Planned</span></div>
+              <h3>Shield</h3>
+              <p class="model-description">A proactive protection layer that blocks attacks and hardens your attack surface before they land.</p>
+              <div class="model-footer"><span>Prevent</span><span data-launch="1"></span></div>
+            </article>
+          </div>
+
+          <div class="quality-banner">
+            <span class="quality-icon">✓</span>
+            <p><strong>Built security-first.</strong> We'd rather ship late than ship before it's ready, so dates are targets, not promises.</p>
+          </div>
+        </section>
+
+        <!-- ROADMAP -->
+        <section class="roadmap-section section-wrap" id="roadmap">
+          <div class="section-heading">
+            <p class="eyebrow">Roadmap</p>
+            <h2>Agent first. Shield <em>three months later.</em></h2>
+          </div>
+
+          <div class="roadmap">
+            <div class="roadmap-line"></div>
+
+            <div class="roadmap-item roadmap-current">
+              <div class="roadmap-marker">01</div>
+              <div class="roadmap-date"><b data-launch="0"></b><span>First release</span></div>
+              <div class="roadmap-content">
+                <h3>Agent</h3>
+                <p>Threat detection and automated incident response across your endpoints and cloud.</p>
+                <span class="roadmap-tag">Up next</span>
+              </div>
+            </div>
+
+            <div class="roadmap-item">
+              <div class="roadmap-marker">02</div>
+              <div class="roadmap-date"><b data-launch="1"></b><span>+3 months</span></div>
+              <div class="roadmap-content">
+                <h3>Shield</h3>
+                <p>Proactive defense that blocks attacks and enforces protective policies before threats reach you.</p>
+                <span class="roadmap-tag">Planned</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="about-section section-wrap" id="about">
+          <div class="about-card">
+            <div class="about-stamp">SECURE<br />BY<br />DESIGN</div>
+            <div class="about-copy">
+              <p class="eyebrow">About</p>
+              <h2>Built to keep you <em>one step ahead.</em></h2>
+              <p>
+                Sweep AI is a cybersecurity SaaS company. We're starting with two products, Agent and Shield, designed
+                to detect, respond to and prevent threats.
+              </p>
+              <p class="about-disclaimer">
+                Sweep AI is pre-launch. Product descriptions and launch dates reflect our current plans and may change.
+              </p>
+              <button class="button button-lime" data-open-signup type="button">Join early access <span>↗</span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- JOIN -->
+        <section class="join-section section-wrap">
+          <div>
+            <p class="eyebrow">Early access</p>
+            <h2>Be protected <em>first.</em></h2>
+          </div>
+          <div>
+            <p>Sign up to get launch updates and early access to Agent before everyone else.</p>
+            <button class="button button-dark" data-open-signup type="button">Sign up <span>↗</span></button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer section-wrap">
+        <a class="brand" href="#top" aria-label="Sweep AI home">
+          <span class="brand-mark">S</span>
+          <span><strong>Sweep AI</strong><small>security, understood</small></span>
+        </a>
+        <p>© <span id="year"></span> Sweep AI. All rights reserved.</p>
+        <a class="back-top" href="#top">Back to top ↑</a>
+      </footer>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div class="modal" id="modal" hidden>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal-close" id="modalClose" type="button" aria-label="Close">×</button>
+        <p class="eyebrow">Sweep AI</p>
+        <h2 id="modalTitle">Welcome</h2>
+        <p class="modal-intro" id="modalIntro"></p>
+
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab" id="tabLogin" type="button" role="tab">Log in</button>
+          <button class="auth-tab" id="tabSignup" type="button" role="tab">Sign up</button>
+        </div>
+
+        <form class="auth-form" id="loginForm" hidden>
+          <label>Email
+            <input type="email" id="loginEmail" placeholder="you@company.com" required />
+          </label>
+          <label>Password
+            <input type="password" id="loginPassword" placeholder="••••••••" required />
+          </label>
+          <button class="button button-dark full-width" type="submit">Log in <span>↗</span></button>
+        </form>
+
+        <form class="auth-form" id="signupForm" hidden>
+          <label>Name
+            <input type="text" id="signupName" placeholder="Your name" required />
+          </label>
+          <label>Work email
+            <input type="email" id="signupEmail" placeholder="you@company.com" required />
+          </label>
+          <button class="button button-dark full-width" type="submit">Get early access <span>↗</span></button>
+        </form>
+
+        <p class="form-message" id="formMessage" aria-live="polite"></p>
+        <p class="modal-footnote">We'll only use your email for product updates.</p>
+      </div>
+    </div>
+
+    <script>
+      // ---- Launch dates: Agent = May of NEXT year, Shield = 3 months later ----
+      const firstYear = new Date().getFullYear() + 1;
+      const launches = [0, 1].map(i => new Date(firstYear, 4 + i * 3, 1)); // May, August
+      const fmt = d => d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+      document.querySelectorAll("[data-launch]").forEach(el => {
+        el.textContent = fmt(launches[Number(el.dataset.launch)]);
+      });
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // ---- Mobile menu ----
+      const menuButton = document.getElementById("menuButton");
+      const mobileNav = document.getElementById("mobileNav");
+      menuButton.addEventListener("click", () => {
+        const open = mobileNav.hidden;
+        mobileNav.hidden = !open;
+        menuButton.setAttribute("aria-expanded", String(open));
+      });
+      mobileNav.querySelectorAll("a").forEach(a =>
+        a.addEventListener("click", () => { mobileNav.hidden = true; menuButton.setAttribute("aria-expanded", "false"); })
+      );
+
+      // ---- Modal ----
+      const modal = document.getElementById("modal");
+      const formMessage = document.getElementById("formMessage");
+      const loginForm = document.getElementById("loginForm");
+      const signupForm = document.getElementById("signupForm");
+      const tabLogin = document.getElementById("tabLogin");
+      const tabSignup = document.getElementById("tabSignup");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalIntro = document.getElementById("modalIntro");
+
+      function showTab(which) {
+        const isLogin = which === "login";
+        loginForm.hidden = !isLogin;
+        signupForm.hidden = isLogin;
+        tabLogin.classList.toggle("selected", isLogin);
+        tabSignup.classList.toggle("selected", !isLogin);
+        modalTitle.textContent = isLogin ? "Log in" : "Get early access";
+        modalIntro.textContent = isLogin
+          ? "Accounts open when Agent launches in " + fmt(launches[0]) + "."
+          : "Be the first to know when Agent launches. No spam, just launch updates.";
+        formMessage.textContent = "";
+        formMessage.classList.remove("ok");
+      }
+      function openModal(which) {
+        mobileNav.hidden = true;
+        menuButton.setAttribute("aria-expanded", "false");
+        showTab(which);
+        modal.hidden = false;
+        document.body.classList.add("modal-open");
+        (which === "login" ? document.getElementById("loginEmail") : document.getElementById("signupName")).focus();
+      }
+      function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove("modal-open");
+      }
+
+      document.getElementById("loginButton").addEventListener("click", () => openModal("login"));
+      document.getElementById("signupButton").addEventListener("click", () => openModal("signup"));
+      document.getElementById("mobileSignup").addEventListener("click", () => openModal("signup"));
+      document.querySelectorAll("[data-open-signup]").forEach(b => b.addEventListener("click", () => openModal("signup")));
+      tabLogin.addEventListener("click", () => showTab("login"));
+      tabSignup.addEventListener("click", () => showTab("signup"));
+      document.getElementById("modalClose").addEventListener("click", closeModal);
+      modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+      document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
+
+      // ---- Forms (front-end only; connect to your backend / Formspree / Mailchimp) ----
+      loginForm.addEventListener("submit", e => {
+        e.preventDefault();
+        formMessage.classList.remove("ok");
+        formMessage.textContent = "Log in isn't available yet. Accounts open when Agent launches.";
+      });
+      signupForm.addEventListener("submit", e => {
+        e.preventDefault();
+        formMessage.classList.add("ok");
+        formMessage.textContent = "You're on the list! We'll be in touch.";
+        e.target.reset();
+      });
+    </script>
+  </body>
+</html>
